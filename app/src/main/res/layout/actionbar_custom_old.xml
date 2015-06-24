@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/actionBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:contentInsetEnd="0dp"
+    app:contentInsetStart="0dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/toolbar"
+        android:paddingBottom="20dp"
+        android:paddingRight="10dp"
+        android:paddingTop="20dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:onClick="onBack">
+            <!--android:layout_toLeftOf="@+id/three_B"-->
+
+            <ImageView
+                android:id="@+id/back_IV"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+
+                android:background="@null"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/arrow_left4" />
+
+            <TextView
+                android:id="@+id/titleHeader_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Header Title"
+                android:textColor="@color/toolbar_text"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/calendar_LL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:onClick="onShowCalendar"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/dateHeader_TV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:textColor="@color/toolbar_text"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/arrow_down" />
+        </LinearLayout>
+
+        <!--<LinearLayout-->
+        <!--android:id="@+id/three_B"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true">-->
+
+
+        <!--<ImageButton-->
+        <!--android:id="@+id/search_IB"-->
+        <!--android:layout_width="30dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:background="@null"-->
+        <!--android:onClick="onRight1"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:src="@drawable/search" />-->
+
+        <!--<ImageButton-->
+        <!--android:id="@+id/filter_IB"-->
+        <!--android:layout_width="30dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:background="@null"-->
+        <!--android:onClick="onRight2"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:src="@drawable/calendar3" />-->
+
+        <!--<ImageButton-->
+        <!--android:id="@+id/add_IB"-->
+        <!--android:layout_width="30dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:background="@null"-->
+        <!--android:onClick="onRight3"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:src="@drawable/add" />-->
+        <!--</LinearLayout>-->
+
+        <!--<RelativeLayout-->
+        <!--android:id="@+id/search_RL"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="5dp"-->
+        <!--android:layout_marginRight="5dp"-->
+
+        <!--android:visibility="gone">-->
+        <!--&lt;!&ndash;android:layout_toLeftOf="@+id/three_B"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_toStartOf="@+id/three_B"&ndash;&gt;-->
+
+
+        <!--<EditText-->
+        <!--android:id="@+id/search_ET"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:background="@null"-->
+        <!--android:singleLine="true" />-->
+
+        <!--<ImageButton-->
+        <!--android:layout_width="25dp"-->
+        <!--android:layout_height="25dp"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginRight="4dp"-->
+        <!--android:background="@null"-->
+        <!--android:onClick="onClearText"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:src="@drawable/cross" />-->
+        <!--</RelativeLayout>-->
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.Toolbar>
