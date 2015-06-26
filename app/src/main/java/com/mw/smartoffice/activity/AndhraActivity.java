@@ -172,6 +172,15 @@ public class AndhraActivity extends ActionBarActivity {
     String dateTimeString;
 
     public void onPickDateTime(final View view, final TextView textView) {
+        /**
+         * Next 2 lines are required because the hack which we have implemented
+         * for the bug creates discrepancies in 5.0. This is because the bug
+         * exists only on Jellybean(4.0) & not on 5.0. On 4.0, these counters are
+         * incremented twice & they become an even number, but not in 5.0
+         **/
+        noOfTimesTimeCalled = 0;
+        noOfTimesDateCalled = 0;
+
         final TimePickerDialog tPicker = new TimePickerDialog(this,
                 new TimePickerDialog.OnTimeSetListener() {
 

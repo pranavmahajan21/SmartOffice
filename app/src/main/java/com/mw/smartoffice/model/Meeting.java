@@ -214,4 +214,5 @@ public class Meeting implements Serializable {
     public void setEmptyMeeting(boolean isEmptyMeeting) {
         this.isEmptyMeeting = isEmptyMeeting;
     }
+
 }

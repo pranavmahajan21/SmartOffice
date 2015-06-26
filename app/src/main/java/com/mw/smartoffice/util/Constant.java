@@ -12,6 +12,9 @@ public class Constant {
     public static String MEETING_CREATE = "/meeting/create_meeting";
     public static String USERS_DATA = "/user/get_users";
 
+    public static String OFFICE_START_TIME = " 08:00:00";
+    public static String OFFICE_END_TIME = " 20:00:00";
+
     public static final int SELECT_USER_ACTIVITY = 1000;
 
     public static final int MEETING_NEW = 1001;

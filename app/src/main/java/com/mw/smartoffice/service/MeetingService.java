@@ -15,6 +15,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mw.smartoffice.activity.MeetingAddActivity;
 import com.mw.smartoffice.activity.MenuActivity;
 import com.mw.smartoffice.activity.R;
 import com.mw.smartoffice.application.MyApp;
@@ -90,53 +91,53 @@ public class MeetingService extends IntentService {
                         tempMeetingList.add(myApp.convertMeetingPOToO(meetingList.get(i)));
                     }
 
-                    for (int i = 0; i < tempMeetingList.size() - 1; i++) {
-//                        Date d1 = formatter.formatStringToDate2("2015-06-23 13:55:00");
-//                        Date d2 = formatter.formatStringToDate2("2015-06-23 14:53:00");
-
-                        Date d1 = tempMeetingList.get(i).getStartDate();
-                        Date d2 = tempMeetingList.get(i + 1).getStartDate();
-
-                        long diff = d2.getTime() - d1.getTime();
-                        long diffMinutes = diff / (60 * 1000);
-                        long noOfInsertions = Math.abs(diffMinutes / (Constant.MINUTES_EXTRA / 2));
-                        System.out.println("#$ noOfInsertions : " + noOfInsertions);
-                        long t = d1.getTime();
-                        Date dateAfterAdding = null;
-                        int multiplier = 0;
-                        while (noOfInsertions >= 1) {
-                            System.out.println("ifif " + noOfInsertions);
-                            long x = (Constant.MINUTES_EXTRA / 4) * Constant.ONE_MINUTE_IN_MILLIS;
-                            long y = (Constant.MINUTES_EXTRA / 2) * multiplier * Constant.ONE_MINUTE_IN_MILLIS;
-                            dateAfterAdding = new Date(t + x + y);
-                            System.out.println("dateAfterAdding " + dateAfterAdding);
-
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.setTime(dateAfterAdding);
-                            int minutes = calendar.get(Calendar.MINUTE);
-
-                            if (minutes < 8) {
-                                calendar.set(Calendar.MINUTE, 15);
-                                calendar.set(Calendar.SECOND, 0);
-                            } else if (minutes < 23) {
-                                calendar.set(Calendar.MINUTE, 30);
-                                calendar.set(Calendar.SECOND, 0);
-                            } else if (minutes < 38) {
-                                calendar.set(Calendar.MINUTE, 45);
-                                calendar.set(Calendar.SECOND, 0);
-                            } else if (minutes < 53) {
-                                calendar.set(Calendar.MINUTE, 0);
-                                calendar.set(Calendar.SECOND, 0);
-                                calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 1);
-                            }
-                            dateAfterAdding = calendar.getTime();
-                            System.out.println("dateAfterAdding " + dateAfterAdding);
-                            tempMeetingList.add(i++ + 1, new Meeting(dateAfterAdding, true));
-                            multiplier++;
-                            noOfInsertions--;
-                        }//while
-
-                    }//for
+//                    for (int i = 0; i < tempMeetingList.size() - 1; i++) {
+////                        Date d1 = formatter.formatStringToDate2("2015-06-23 13:55:00");
+////                        Date d2 = formatter.formatStringToDate2("2015-06-23 14:53:00");
+//
+//                        Date d1 = tempMeetingList.get(i).getStartDate();
+//                        Date d2 = tempMeetingList.get(i + 1).getStartDate();
+//
+//                        long diff = d2.getTime() - d1.getTime();
+//                        long diffMinutes = diff / (60 * 1000);
+//                        long noOfInsertions = Math.abs(diffMinutes / (Constant.MINUTES_EXTRA / 2));
+//                        System.out.println("#$ noOfInsertions : " + noOfInsertions);
+//                        long t = d1.getTime();
+//                        Date dateAfterAdding = null;
+//                        int multiplier = 0;
+//                        while (noOfInsertions >= 1) {
+//                            System.out.println("ifif " + noOfInsertions);
+//                            long delta1 = (Constant.MINUTES_EXTRA / 4) * Constant.ONE_MINUTE_IN_MILLIS;
+//                            long delta2 = (Constant.MINUTES_EXTRA / 2) * multiplier * Constant.ONE_MINUTE_IN_MILLIS;
+//                            dateAfterAdding = new Date(t + delta1 + delta2);
+//                            System.out.println("dateAfterAdding " + dateAfterAdding);
+//
+//                            Calendar calendar = Calendar.getInstance();
+//                            calendar.setTime(dateAfterAdding);
+//                            int minutes = calendar.get(Calendar.MINUTE);
+//
+//                            if (minutes < 8) {
+//                                calendar.set(Calendar.MINUTE, 15);
+//                                calendar.set(Calendar.SECOND, 0);
+//                            } else if (minutes < 23) {
+//                                calendar.set(Calendar.MINUTE, 30);
+//                                calendar.set(Calendar.SECOND, 0);
+//                            } else if (minutes < 38) {
+//                                calendar.set(Calendar.MINUTE, 45);
+//                                calendar.set(Calendar.SECOND, 0);
+//                            } else if (minutes < 53) {
+//                                calendar.set(Calendar.MINUTE, 0);
+//                                calendar.set(Calendar.SECOND, 0);
+//                                calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 1);
+//                            }
+//                            dateAfterAdding = calendar.getTime();
+//                            System.out.println("dateAfterAdding " + dateAfterAdding);
+//                            tempMeetingList.add(i++ + 1, new Meeting(dateAfterAdding, true));
+//                            multiplier++;
+//                            noOfInsertions--;
+//                        }//while
+//
+//                    }//for
 
                     System.out.println("tempMeetingList.size()" + tempMeetingList.size());
                     Toast.makeText(MeetingService.this, "tempMeetingList.size()" + tempMeetingList.size(), Toast.LENGTH_SHORT).show();
@@ -153,6 +154,9 @@ public class MeetingService extends IntentService {
     private void onRequestComplete() {
         if (MenuActivity.isActivityVisible) {
             Intent nextIntent = new Intent("app_data");
+            LocalBroadcastManager.getInstance(this).sendBroadcast(nextIntent);
+        }else if (MeetingAddActivity.isActivityVisible) {
+            Intent nextIntent = new Intent("meeting_update_receiver");
             LocalBroadcastManager.getInstance(this).sendBroadcast(nextIntent);
         }
     }

@@ -57,17 +57,6 @@
             android:textSize="18sp" />
 
         <TextView
-
-            android:id="@+id/departmentLabel_TV"
-            style="@style/TV2"
-            android:text="Department" />
-
-        <TextView
-            android:id="@+id/department_TV"
-            style="@style/TV3"
-            android:text="New Text" />
-
-        <TextView
             android:id="@+id/designationLabel_TV"
             style="@style/TV2"
             android:text="Designation" />
@@ -75,7 +64,17 @@
         <TextView
             android:id="@+id/designation_TV"
             style="@style/TV3"
-            android:text="New Text" />
+            android:text="-" />
+
+        <TextView
+            android:id="@+id/departmentLabel_TV"
+            style="@style/TV2"
+            android:text="Department" />
+
+        <TextView
+            android:id="@+id/department_TV"
+            style="@style/TV3"
+            android:text="-" />
 
         <TextView
             android:id="@+id/emailLabel_TV"
@@ -85,17 +84,27 @@
         <TextView
             android:id="@+id/email_TV"
             style="@style/TV3"
-            android:text="New Text" />
+            android:text="-" />
 
         <TextView
-            android:id="@+id/phoneLabel_TV"
+            android:id="@+id/mobileLabel_TV"
             style="@style/TV2"
-            android:text="Phone Number" />
+            android:text="Mobile Number" />
 
         <TextView
-            android:id="@+id/phone_TV"
+            android:id="@+id/mobile_TV"
             style="@style/TV3"
-            android:text="New Text" />
+            android:text="-" />
+
+        <TextView
+            android:id="@+id/officeLabel_TV"
+            style="@style/TV2"
+            android:text="Office Number" />
+
+        <TextView
+            android:id="@+id/office_TV"
+            style="@style/TV3"
+            android:text="-" />
     </LinearLayout>
 
 

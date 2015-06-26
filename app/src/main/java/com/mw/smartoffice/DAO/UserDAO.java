@@ -30,6 +30,7 @@ public class UserDAO {
     public ParseUser loginUser(String userName, String password) {
         try {
             ParseUser.logIn(userName, password);
+
         } catch (ParseException e) {
             e.printStackTrace();
         }

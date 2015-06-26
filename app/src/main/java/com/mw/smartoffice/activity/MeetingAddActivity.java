@@ -2,9 +2,13 @@ package com.mw.smartoffice.activity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -17,6 +21,7 @@ import com.android.volley.toolbox.Volley;
 import com.mw.smartoffice.application.MyApp;
 import com.mw.smartoffice.model.Meeting;
 import com.mw.smartoffice.model.User;
+import com.mw.smartoffice.service.MeetingService;
 import com.mw.smartoffice.util.Constant;
 import com.mw.smartoffice.util.CreateDialog;
 import com.mw.smartoffice.util.DateFormatter;
@@ -35,6 +40,8 @@ import java.util.List;
 
 public class MeetingAddActivity extends AndhraActivity {
 
+    public static boolean isActivityVisible = false;
+
     EditText subject_ET, description_ET, location_ET;
 
     TextView startLabel_TV, endLabel_TV, followUpLabel_TV, inviteesLabel_TV;
@@ -52,7 +59,7 @@ public class MeetingAddActivity extends AndhraActivity {
 
     int requestCode;
 
-    RequestQueue queue;
+//    RequestQueue queue;
 
     CreateDialog createDialog;
     ProgressDialog progressDialog;
@@ -62,6 +69,13 @@ public class MeetingAddActivity extends AndhraActivity {
 
     DateFormatter formatter;
 
+    private BroadcastReceiver meetingUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            progressDialog.dismiss();
+        }
+    };
+
     private void initThings() {
         myApp = (MyApp) getApplicationContext();
         previousIntent = getIntent();
@@ -69,11 +83,8 @@ public class MeetingAddActivity extends AndhraActivity {
         requestCode = previousIntent.getIntExtra("request_code", -1);
 
         if (requestCode == Constant.MEETING_EXISTING) {
-
-//            meetingList = new ArrayList<List<Meeting>>(myApp.getLoginUser().getMeetingMap().values()).get(previousIntent.getIntExtra("position", 0));
-
-            selectedMeeting = new ArrayList<List<Meeting>>(myApp.getLoginUser().getMeetingMap().values()).get(previousIntent.getIntExtra("position", 0)).get(0);
-            selectedMeeting = myApp.getLoginUser().getMeetingList().get(previousIntent.getIntExtra("position", 0));
+//            selectedMeeting = new ArrayList<List<Meeting>>(myApp.getLoginUser().getMeetingMap().values()).get(previousIntent.getIntExtra("position", 0)).get(0);
+            selectedMeeting = myApp.getTodayMeetingList().get(previousIntent.getIntExtra("position", 0));
             Toast.makeText(this, "position after : " + selectedMeeting.getMeetingId(), Toast.LENGTH_SHORT).show();
         }
 
@@ -81,10 +92,8 @@ public class MeetingAddActivity extends AndhraActivity {
         progressDialog = createDialog.createProgressDialog("Saving Changes",
                 "This may take some time", true, null);
 
-
         formatter = new DateFormatter();
-
-        queue = Volley.newRequestQueue(this);
+//        queue = Volley.newRequestQueue(this);
     }
 
     public void findThings() {
@@ -131,23 +140,24 @@ public class MeetingAddActivity extends AndhraActivity {
     public void initView() {
         setTypeface();
         if (requestCode == Constant.MEETING_NEW) {
-//            super.setToolbar("Create New Meeting", View.GONE, View.GONE, View.VISIBLE, getResources().getDrawable(R.drawable.save));
             super.setToolbar("Create Meeting", Constant.CHILD_BUTTON_MEETING_ADD);
             no_RB.setChecked(true);
+            staticNonsense();
         } else if (requestCode == Constant.MEETING_EXISTING) {
-//            super.setToolbar("Create Follow Up Meeting", View.GONE, View.GONE, View.VISIBLE, getResources().getDrawable(R.drawable.save));
-            super.setToolbar("Meeting", Constant.CHILD_BUTTON_MEETING_EDIT);
-            yes_RB.setChecked(true);
+            if (selectedMeeting.isEmptyMeeting()) {
+                super.setToolbar("Create Meeting", Constant.CHILD_BUTTON_MEETING_ADD);
+                startDateTime_TV.setText(formatter.formatDateToString4(selectedMeeting.getStartDate()));
+            }else {
+                super.setToolbar("Create Meeting", Constant.CHILD_BUTTON_MEETING_EDIT);
+                yes_RB.setChecked(true);
 
-            subject_ET.setEnabled(false);
-            description_ET.setEnabled(false);
-            location_ET.setEnabled(false);
+                subject_ET.setEnabled(false);
+                description_ET.setEnabled(false);
+                location_ET.setEnabled(false);
 
-            startDateTime_RL.setClickable(false);
-            endDateTime_RL.setClickable(false);
-            invitees_RL.setClickable(false);
-
-            if (selectedMeeting != null) {
+                startDateTime_RL.setClickable(false);
+                endDateTime_RL.setClickable(false);
+                invitees_RL.setClickable(false);
                 subject_ET.setText(selectedMeeting.getSubject());
                 description_ET.setText(selectedMeeting.getDescription());
                 location_ET.setText(selectedMeeting.getLocation());
@@ -155,7 +165,6 @@ public class MeetingAddActivity extends AndhraActivity {
                 startDateTime_TV.setText(formatter.formatDateToString4(selectedMeeting.getStartDate()));
                 endDateTime_TV.setText(formatter.formatDateToString4(selectedMeeting.getEndDate()));
 
-                Toast.makeText(this, "user size " + selectedMeeting.getAttendees().size(), Toast.LENGTH_LONG).show();
 
                 String attendees = null;
 
@@ -287,10 +296,10 @@ public class MeetingAddActivity extends AndhraActivity {
 
                     JSONObject data = new JSONObject();
                     try {
-                        data.put("action", "com.mw.smartoffice.notification");
+                        data.put("action", "com.mw.smartoffice.NOTIFICATION");
                         data.put("type", 0);
                         data.put("alert", "New Meeting");
-                        data.put("fromUserId",ParseUser.getCurrentUser().getObjectId());
+                        data.put("fromUserId", ParseUser.getCurrentUser().getObjectId());
 //                        data.put("message", message);
                     } catch (JSONException e2) {
                         e2.printStackTrace();
@@ -301,63 +310,19 @@ public class MeetingAddActivity extends AndhraActivity {
                     push.setData(data);
                     push.sendInBackground();
 
+                    Intent serviceIntent = new Intent(MeetingAddActivity.this, MeetingService.class);
+                    startService(serviceIntent);
                     progressDialog.dismiss();
+
+                    progressDialog = createDialog.createProgressDialog("Updating Meetings",
+                            "This may take some time", true, null);
+                    progressDialog.show();
                 } else {
                     // The save failed.
                     Toast.makeText(MeetingAddActivity.this, "Unable to create meeting", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-//        JSONObject params = new JSONObject();
-//        try {
-//            params.put("owner_user_id", myApp.getLoginUser().getUserId());
-//            params.put("subject", subject_ET.getText().toString());
-//            params.put("description", description_ET.getText().toString());
-//            params.put("location", location_ET.getText().toString());
-//            params.put("duration", "2 hours");
-//
-//            JSONArray aa = new JSONArray();
-//            for (int i = 0; i < selectedUserIndexList.size(); i++) {
-//                aa.put(myApp.getLoginUser().getUserList().get(selectedUserIndexList.get(i)).getUserId());
-//            }
-//
-//            params.put("userList", aa);
-//
-//        } catch (JSONException e1) {
-//            e1.printStackTrace();
-//        }
-//
-//        String url = Constant.BASE_URL + Constant.MEETING_CREATE;
-//        progressDialog.show();
-//        try {
-//            System.out.println("URL : " + url);
-//            System.out.println("param  : " + params);
-//
-//            JsonObjectRequest jsonArrayRequest = new JsonObjectRequest(
-//                    Method.POST, url, params,
-//                    new Response.Listener<JSONObject>() {
-//
-//                        @Override
-//                        public void onResponse(JSONObject response) {
-//                            System.out.println("length2" + response);
-////                            onPositiveResponse();
-//                        }
-//                    }, new Response.ErrorListener() {
-//
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    progressDialog.dismiss();
-//                }
-//            });
-//
-//            RetryPolicy policy = new DefaultRetryPolicy(30000,
-//                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-//                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-//            jsonArrayRequest.setRetryPolicy(policy);
-//            queue.add(jsonArrayRequest);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     ArrayList<Integer> selectedUserIndexList;
@@ -380,6 +345,24 @@ public class MeetingAddActivity extends AndhraActivity {
                 user_TV.setText(temp);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isActivityVisible = true;
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                meetingUpdateReceiver,
+                new IntentFilter("meeting_update_receiver"));
+
+    }
+
+    @Override
+    protected void onPause() {
+        isActivityVisible = false;
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(
+                meetingUpdateReceiver);
+        super.onPause();
     }
 
     public void onPickDateTime(View view) {

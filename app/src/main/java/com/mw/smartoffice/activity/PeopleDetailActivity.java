@@ -13,8 +13,8 @@ public class PeopleDetailActivity extends AndhraActivity {
     ImageView profilePic_IV;
     TextView name_TV;
 
-    TextView departmentLabel_TV, designationLabel_TV, emailLabel_TV, phoneLabel_TV;
-    TextView department_TV, designation_TV, email_TV, phone_TV;
+    TextView departmentLabel_TV, designationLabel_TV, emailLabel_TV, mobileLabel_TV, officeLabel_TV;
+    TextView department_TV, designation_TV, email_TV, mobile_TV, office_TV;
 
 
     MyApp myApp;
@@ -39,26 +39,30 @@ public class PeopleDetailActivity extends AndhraActivity {
         departmentLabel_TV = (TextView) findViewById(R.id.departmentLabel_TV);
         designationLabel_TV = (TextView) findViewById(R.id.designationLabel_TV);
         emailLabel_TV = (TextView) findViewById(R.id.emailLabel_TV);
-        phoneLabel_TV = (TextView) findViewById(R.id.phoneLabel_TV);
+        mobileLabel_TV = (TextView) findViewById(R.id.mobileLabel_TV);
+        officeLabel_TV = (TextView) findViewById(R.id.officeLabel_TV);
 
         department_TV = (TextView) findViewById(R.id.department_TV);
         designation_TV = (TextView) findViewById(R.id.designation_TV);
         email_TV = (TextView) findViewById(R.id.email_TV);
-        phone_TV = (TextView) findViewById(R.id.phone_TV);
+        mobile_TV = (TextView) findViewById(R.id.mobile_TV);
+        office_TV = (TextView) findViewById(R.id.office_TV);
     }
 
     private void setTypeface() {
-//        name_TV.setTypeface();
-//
-//        departmentLabel_TV.setTypeface();
-//        designationLabel_TV.setTypeface();
-//        emailLabel_TV.setTypeface();
-//        phoneLabel_TV.setTypeface();
-//
-//        department_TV.setTypeface();
-//        designation_TV.setTypeface();
-//        email_TV.setTypeface();
-//        phone_TV.setTypeface();
+        name_TV.setTypeface(myApp.getTypefaceBoldLato());
+
+        departmentLabel_TV.setTypeface(myApp.getTypefaceBoldLato());
+        designationLabel_TV.setTypeface(myApp.getTypefaceBoldLato());
+        emailLabel_TV.setTypeface(myApp.getTypefaceBoldLato());
+        mobileLabel_TV.setTypeface(myApp.getTypefaceBoldLato());
+        officeLabel_TV.setTypeface(myApp.getTypefaceBoldLato());
+
+        department_TV.setTypeface(myApp.getTypefaceRegularLato());
+        designation_TV.setTypeface(myApp.getTypefaceRegularLato());
+        email_TV.setTypeface(myApp.getTypefaceRegularLato());
+        mobile_TV.setTypeface(myApp.getTypefaceRegularLato());
+        office_TV.setTypeface(myApp.getTypefaceRegularLato());
     }
 
     private void initView() {
@@ -68,7 +72,7 @@ public class PeopleDetailActivity extends AndhraActivity {
         department_TV.setText(selectedUser.getDepartment());
         designation_TV.setText(selectedUser.getDesignation());
         email_TV.setText(selectedUser.getEmail());
-        phone_TV.setText(selectedUser.getMobileNo());
+        mobile_TV.setText(selectedUser.getMobileNo());
     }
 
 
@@ -77,7 +81,7 @@ public class PeopleDetailActivity extends AndhraActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_people_detail);
 //        super.setToolbar("People", View.GONE, View.GONE, View.GONE, null);
-        super.setToolbar("People",-1);
+        super.setToolbar("People", -1);
 
         initThings();
         findThings();

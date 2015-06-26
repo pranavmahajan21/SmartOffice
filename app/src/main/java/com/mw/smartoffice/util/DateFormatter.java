@@ -21,7 +21,7 @@ public class DateFormatter {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         String dateStr = formatter.format(date);
-        System.out.println(">><<><><><" + dateStr);
+//        System.out.println("formatter : " + dateStr);
         return dateStr;
     }
 
@@ -33,7 +33,7 @@ public class DateFormatter {
         SimpleDateFormat formatter = new SimpleDateFormat("dd MMM");
 
         String dateStr = formatter.format(date);
-        System.out.println(">><<><><><" + dateStr);
+//        System.out.println("formatter : " + dateStr);
         return dateStr;
     }
 
@@ -45,7 +45,7 @@ public class DateFormatter {
         SimpleDateFormat formatter = new SimpleDateFormat("hh:mm a");
 
         String dateStr = formatter.format(date);
-        System.out.println(">><<><><><" + dateStr);
+//        System.out.println("formatter : " + dateStr);
         return dateStr;
     }
 
@@ -57,7 +57,7 @@ public class DateFormatter {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy, HH:mm");
 
         String dateStr = formatter.format(date);
-        System.out.println(">><<><><><" + dateStr);
+//        System.out.println("formatter : " + dateStr);
         return dateStr;
     }
 

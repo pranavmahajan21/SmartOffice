@@ -18,6 +18,7 @@ import com.mw.smartoffice.util.Constant;
 import com.mw.smartoffice.util.DateComparatorIgnoringTime;
 import com.mw.smartoffice.util.DateFormatter;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -53,13 +54,148 @@ public class MeetingListActivity2 extends AndhraActivity {
      * Calendar stuff *
      */
 
+    List<Meeting> allMeetingList;
+    List<Meeting> todayMeetingList = new ArrayList<Meeting>();
+
+    private void initDates(Calendar calendar) {
+        d1 = calendar.getTime();
+        d1 = formatter.formatStringToDate(formatter.formatDateToString(d1));
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + 1);
+        d2 = calendar.getTime();
+        d2 = formatter.formatStringToDate(formatter.formatDateToString(d2));
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 1);
+        System.out.println("Date range  : " + d1 + "   " + d2);
+    }
+
+    private void initTodayMeetingList() {
+        System.out.println("Meeting Size : " + allMeetingList.size());
+        for (int i = 0; i < allMeetingList.size(); i++) {
+            System.out.println("Meeting Dates : " + allMeetingList.get(i).getStartDate());
+        }
+        int x = binary_search(allMeetingList, 0, allMeetingList.size() - 1);
+
+        if (x != -1) {
+            int low = x - 1;
+            int high = x + 1;
+
+            while (low >= 0 && allMeetingList.get(low).getStartDate().compareTo(d1) > 0 && d2.compareTo(allMeetingList.get(low).getStartDate()) > 0) {
+                low--;
+            }
+            while (high < allMeetingList.size() && allMeetingList.get(high).getStartDate().compareTo(d1) > 0 && d2.compareTo(allMeetingList.get(high).getStartDate()) > 0) {
+                high++;
+            }
+
+            Toast.makeText(this, "x : " + x + "low : " + low + "high : " + high, Toast.LENGTH_LONG).show();
+            System.out.println("x : " + x + "low : " + low + "high : " + high);
+
+            /** We have to exclude the lowest & highest point. Therefore we
+             * start from low+1 & end before high **/
+            for (int i = low + 1; i < high; i++) {
+                todayMeetingList.add(allMeetingList.get(i));
+            }
+
+            if(todayMeetingList.size() <1){
+                Toast.makeText(this, "No meetings scheduled for today", Toast.LENGTH_SHORT).show();
+            }
+
+            Date officeStartTime = formatter.formatStringToDate2(formatter.formatDateToString(new Date()) + Constant.OFFICE_START_TIME);
+            Date officeEndTime = formatter.formatStringToDate2(formatter.formatDateToString(new Date()) + Constant.OFFICE_END_TIME);
+
+            if ((todayMeetingList.get(0).getStartDate().getTime() - officeStartTime.getTime()) / (60 * 1000) > 15) {
+                todayMeetingList.add(0, new Meeting(officeStartTime, true));
+            }
+            if ((officeEndTime.getTime() - todayMeetingList.get(0).getStartDate().getTime()) / (60 * 1000) > 15) {
+                todayMeetingList.add(todayMeetingList.size(), new Meeting(officeEndTime, true));
+            }
+
+            addEmptyMeetings();
+        }
+    }
+
+    int binary_search(List<Meeting> meetingList, int min, int max) {
+        if (max < min)
+            return -1;
+        else {
+            int imid = (min + max) / 2;
+
+            if (d1.compareTo(meetingList.get(imid).getStartDate()) > 0)
+                // key is in lower subset
+                return binary_search(meetingList, imid + 1, max);
+            else if (meetingList.get(imid).getStartDate().compareTo(d2) > 0)
+                // key is in upper subset
+                return binary_search(meetingList, min, imid - 1);
+            else
+                // key has been found
+                return imid;
+        }
+    }
+
+    private void addEmptyMeetings() {
+        for (int i = 0; i < todayMeetingList.size() - 1; i++) {
+//                        Date d1 = formatter.formatStringToDate2("2015-06-23 13:55:00");
+//                        Date d2 = formatter.formatStringToDate2("2015-06-23 14:53:00");
+
+            Date d1 = todayMeetingList.get(i).getStartDate();
+            Date d2 = todayMeetingList.get(i + 1).getStartDate();
+
+            long diff = d2.getTime() - d1.getTime();
+            long diffMinutes = diff / (60 * 1000);
+            long noOfInsertions = Math.abs(diffMinutes / (Constant.MINUTES_EXTRA / 2)) - 1;
+            System.out.println("#$ noOfInsertions : " + noOfInsertions);
+
+            long t = d1.getTime();
+            Date dateAfterAdding = null;
+            int multiplier = 0;
+            while (noOfInsertions >= 1) {
+//                System.out.println("ifif " + noOfInsertions);
+                if (noOfInsertions == 2 || noOfInsertions == 1) {
+                }
+
+                long delta1 = (Constant.MINUTES_EXTRA / 4) * Constant.ONE_MINUTE_IN_MILLIS;
+                long delta2 = (Constant.MINUTES_EXTRA / 2) * multiplier * Constant.ONE_MINUTE_IN_MILLIS;
+                dateAfterAdding = new Date(t + delta1 + delta2);
+                System.out.println("dateAfterAdding " + dateAfterAdding);
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(dateAfterAdding);
+                int minutes = calendar.get(Calendar.MINUTE);
+
+                // eg. 12:48
+
+                if (minutes < 8) {
+                    calendar.set(Calendar.MINUTE, 15);
+                    calendar.set(Calendar.SECOND, 0);
+                } else if (minutes < 23) {
+                    calendar.set(Calendar.MINUTE, 30);
+                    calendar.set(Calendar.SECOND, 0);
+                } else if (minutes < 38) {
+                    calendar.set(Calendar.MINUTE, 45);
+                    calendar.set(Calendar.SECOND, 0);
+                } else if (minutes < 53) {
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 1);
+                } else {
+                    calendar.set(Calendar.MINUTE, 15);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 1);
+                }
+
+                dateAfterAdding = calendar.getTime();
+                System.out.println("dateAfterAdding " + dateAfterAdding);
+                todayMeetingList.add(i++ + 1, new Meeting(dateAfterAdding, true));
+                multiplier++;
+                noOfInsertions--;
+            }//while
+        }//for
+        myApp.setTodayMeetingList(todayMeetingList);
+    }
+
     private void initThings() {
         myApp = (MyApp) getApplicationContext();
         meetingMap = myApp.getLoginUser().getMeetingMap();
 
-        if (meetingMap != null && meetingMap.size() > 0) {
-            adapter = new MeetingAdapter2(this, meetingMap, myApp.getLoginUser().getMeetingList());
-        }
+        allMeetingList = myApp.getLoginUser().getMeetingList();
 
         /** Calendar stuff **/
         selectedDateCalendar = Calendar.getInstance();
@@ -72,9 +208,88 @@ public class MeetingListActivity2 extends AndhraActivity {
         String[] dateArr = formatter.formatDateToString(new Date()).split("-");
         selectedDateCalendar.set(Integer.parseInt(dateArr[0]), Integer.parseInt(dateArr[1]) - 1, Integer.parseInt(dateArr[2]));
 
+        initDates(selectedDateCalendar);
+
         calendarAdapter = new CalendarAdapter(this, selectedDateCalendar);
         /** Calendar stuff **/
+
+
+//        int x = binary_search(allMeetingList, 0, allMeetingList.size() - 1);
+//        int low = x - 1;
+//        int high = x + 1;
+//
+//        while (low >= 0 && allMeetingList.get(low).getStartDate().compareTo(d1) > 0 && d2.compareTo(allMeetingList.get(low).getStartDate()) > 0) {
+//            low--;
+//        }
+//        while (high < allMeetingList.size() && allMeetingList.get(high).getStartDate().compareTo(d1) > 0 && d2.compareTo(allMeetingList.get(high).getStartDate()) > 0) {
+//            high++;
+//        }
+//
+//        /** We have to exclude the lowest & highest point. Therefore we
+//         * start from low+1 & end before high **/
+//        for (int i = low + 1; i < high; i++) {
+//            todayMeetingList.add(allMeetingList.get(i));
+//        }
+        initTodayMeetingList();
+
+        /** Add empty meetings **/
+//        for (int i = 0; i < todayMeetingList.size() - 1; i++) {
+////                        Date d1 = formatter.formatStringToDate2("2015-06-23 13:55:00");
+////                        Date d2 = formatter.formatStringToDate2("2015-06-23 14:53:00");
+//
+//            Date d1 = todayMeetingList.get(i).getStartDate();
+//            Date d2 = todayMeetingList.get(i + 1).getStartDate();
+//
+//            long diff = d2.getTime() - d1.getTime();
+//            long diffMinutes = diff / (60 * 1000);
+//            long noOfInsertions = Math.abs(diffMinutes / (Constant.MINUTES_EXTRA / 2));
+//            System.out.println("#$ noOfInsertions : " + noOfInsertions);
+//            long t = d1.getTime();
+//            Date dateAfterAdding = null;
+//            int multiplier = 0;
+//            while (noOfInsertions >= 1) {
+//                System.out.println("ifif " + noOfInsertions);
+//                long delta1 = (Constant.MINUTES_EXTRA / 4) * Constant.ONE_MINUTE_IN_MILLIS;
+//                long delta2 = (Constant.MINUTES_EXTRA / 2) * multiplier * Constant.ONE_MINUTE_IN_MILLIS;
+//                dateAfterAdding = new Date(t + delta1 + delta2);
+//                System.out.println("dateAfterAdding " + dateAfterAdding);
+//
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.setTime(dateAfterAdding);
+//                int minutes = calendar.get(Calendar.MINUTE);
+//
+//                if (minutes < 8) {
+//                    calendar.set(Calendar.MINUTE, 15);
+//                    calendar.set(Calendar.SECOND, 0);
+//                } else if (minutes < 23) {
+//                    calendar.set(Calendar.MINUTE, 30);
+//                    calendar.set(Calendar.SECOND, 0);
+//                } else if (minutes < 38) {
+//                    calendar.set(Calendar.MINUTE, 45);
+//                    calendar.set(Calendar.SECOND, 0);
+//                } else if (minutes < 53) {
+//                    calendar.set(Calendar.MINUTE, 0);
+//                    calendar.set(Calendar.SECOND, 0);
+//                    calendar.set(Calendar.HOUR, calendar.get(Calendar.HOUR) + 1);
+//                }
+//                dateAfterAdding = calendar.getTime();
+//                System.out.println("dateAfterAdding " + dateAfterAdding);
+//                todayMeetingList.add(i++ + 1, new Meeting(dateAfterAdding, true));
+//                multiplier++;
+//                noOfInsertions--;
+//            }//while
+//
+//        }//for
+
+
+        if (todayMeetingList != null && todayMeetingList.size() > 0) {
+            adapter = new MeetingAdapter2(this, meetingMap, todayMeetingList);
+        }
+
     }
+
+    Date d1, d2;
+
 
     private void findThings() {
         meeting_LV = (ListView) findViewById(R.id.meeting_LV);
@@ -85,9 +300,9 @@ public class MeetingListActivity2 extends AndhraActivity {
     }
 
     private void initView() {
-        if (adapter != null) {
-            meeting_LV.setAdapter(adapter);
-        }
+//        if (adapter != null) {
+        meeting_LV.setAdapter(adapter);
+//        }
 
         dateHeader_TV.setText("Today");
 
@@ -116,7 +331,7 @@ public class MeetingListActivity2 extends AndhraActivity {
 //                nextIntent.putExtra("position", position);
 //                startActivity(nextIntent);
 
-                Toast.makeText(MeetingListActivity2.this, "position before : " + position, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MeetingListActivity2.this, "position before : " + position, Toast.LENGTH_SHORT).show();
 
                 nextIntent = new Intent(MeetingListActivity2.this, MeetingAddActivity.class);
                 nextIntent.putExtra("position", position);
@@ -141,6 +356,17 @@ public class MeetingListActivity2 extends AndhraActivity {
 
                     /** Delta2 **/
                     selectedDateCalendar.set(Calendar.DATE, Integer.parseInt(day));
+
+                    todayMeetingList = new ArrayList<Meeting>();
+                    adapter = null;
+                    initDates(selectedDateCalendar);
+                    initTodayMeetingList();
+                    if (todayMeetingList != null && todayMeetingList.size() > 0) {
+                        adapter = new MeetingAdapter2(MeetingListActivity2.this, meetingMap, todayMeetingList);
+                    }
+//                    if (adapter != null) {
+                    meeting_LV.setAdapter(adapter);
+//                    }
 
                     Date tempDate = selectedDateCalendar.getTime();
                     int x = dateComparator.compare(tempDate, new Date());
